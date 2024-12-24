@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   HomeIcon,
   UsersIcon,
@@ -6,15 +7,19 @@ import {
   Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
 
-const menuItems = [
-  { name: 'Inicio', path: '/dashboard', icon: HomeIcon },
-  { name: 'Usuarios', path: '/dashboard/usuarios', icon: UsersIcon },
-  { name: 'Estadísticas', path: '/dashboard/estadisticas', icon: ChartBarIcon },
-  { name: 'Configuración', path: '/dashboard/configuracion', icon: Cog6ToothIcon },
-];
-
 export default function Sidebar() {
   const location = useLocation();
+  const { user } = useAuth();
+
+  // Definimos los items del menú basados en el rol actual
+  const menuItems = [
+    { name: 'Inicio', path: '/dashboard', icon: HomeIcon },
+    ...(user?.rolActual === 'admin' ? [
+      { name: 'Usuarios', path: '/dashboard/usuarios', icon: UsersIcon }
+    ] : []),
+    { name: 'Estadísticas', path: '/dashboard/estadisticas', icon: ChartBarIcon },
+    { name: 'Configuración', path: '/dashboard/configuracion', icon: Cog6ToothIcon },
+  ];
 
   return (
     <aside className="bg-gray-800 text-white w-64 min-h-screen p-4">
@@ -26,14 +31,13 @@ export default function Sidebar() {
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
-            
+
             return (
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  className={`flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-700 transition-colors ${
-                    isActive ? 'bg-gray-700' : ''
-                  }`}
+                  className={`flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-700 transition-colors ${isActive ? 'bg-gray-700' : ''
+                    }`}
                 >
                   <Icon className="w-5 h-5" />
                   <span>{item.name}</span>

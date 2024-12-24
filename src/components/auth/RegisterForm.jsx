@@ -8,8 +8,7 @@ export default function RegisterForm() {
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
-    password: '',
-    rol: 'usuario' // Por defecto, el rol será 'usuario'
+    password: ''
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -94,21 +93,6 @@ export default function RegisterForm() {
                 onChange={handleChange}
                 required
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="rol">Tipo de usuario</Label>
-              <select
-                id="rol"
-                name="rol"
-                value={formData.rol}
-                onChange={handleChange}
-                className="flex h-12 w-full rounded-lg border-2 border-gray-800 bg-[#1a1a1a] px-4 py-2 text-base text-white transition-colors"
-                required
-              >
-                <option value="usuario">Usuario común</option>
-                <option value="admin">Administrador</option>
-              </select>
             </div>
 
             <Button type="submit">

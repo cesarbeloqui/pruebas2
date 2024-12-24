@@ -32,7 +32,9 @@ export const AuthProvider = ({ children }) => {
         // Guardamos el rol original al iniciar sesión
         setUser({
           ...data.usuario,
-          rolOriginal: data.usuario.rol
+          rolOriginal: data.usuario.rol,
+          // El rol actual será igual al rol original inicialmente
+          rolActual: data.usuario.rol
         });
       } else {
         localStorage.removeItem('token');
@@ -59,10 +61,11 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        // Guardamos el rol original al iniciar sesión
+        // Guardamos tanto el rol original como el rol actual
         setUser({
           ...data.usuario,
-          rolOriginal: data.usuario.rol
+          rolOriginal: data.usuario.rol,
+          rolActual: data.usuario.rol
         });
         navigate('/dashboard');
         return { success: true };
@@ -81,32 +84,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   const switchRole = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/auth/switch-role', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        // Mantenemos el rol original al cambiar de rol
-        setUser({
-          ...data.usuario,
-          rolOriginal: user.rolOriginal
-        });
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Error al cambiar rol:', error);
-      return false;
+    // Solo cambiamos el rolActual, manteniendo el rolOriginal
+    if (user.rolOriginal === 'admin') {
+      setUser(prev => ({
+        ...prev,
+        rolActual: prev.rolActual === 'admin' ? 'usuario' : 'admin'
+      }));
+      return true;
     }
+    return false;
   };
 
   const value = {

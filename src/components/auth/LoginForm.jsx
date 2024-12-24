@@ -73,11 +73,11 @@ export default function LoginForm() {
           <div className="mt-6 text-center">
             <p className="text-gray-400">
               ¿No tienes una cuenta?{' '}
-              <Link 
-                to="/registro" 
+              <Link
+                to="/registro"
                 className="text-[#646cff] hover:text-[#747bff] transition-colors font-medium"
               >
-                Regístrate aquaaa
+                Regístrate aqui
               </Link>
             </p>
           </div>
