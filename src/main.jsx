@@ -13,7 +13,17 @@ createRoot(document.getElementById('root')).render(
       <AuthProvider>
         <SocketProvider>
           <App />
-          <Toaster position="top-right" />
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              className: '',
+              style: {
+                background: '#1a1a1a',
+                color: '#fff',
+                border: '1px solid #333',
+              },
+            }}
+          />
         </SocketProvider>
       </AuthProvider>
     </BrowserRouter>

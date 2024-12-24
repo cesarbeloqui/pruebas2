@@ -4,10 +4,9 @@ import {
   login,
   registro,
   verificarUsuario,
-  cambiarRol,
-  listarUsuarios,
   toggleUsuario,
-  cambiarRolUsuario
+  cambiarRolUsuario,
+  listarUsuarios
 } from '../controllers/auth.controller.js';
 
 const router = express.Router();
@@ -18,7 +17,6 @@ router.post('/registro', registro);
 
 // Rutas protegidas
 router.get('/verificar', verificarToken, verificarUsuario);
-router.post('/switch-role', verificarToken, cambiarRol);
 
 // Rutas admin
 router.get('/usuarios', verificarToken, esAdmin, listarUsuarios);
