@@ -6,6 +6,11 @@ import { sendPasswordResetEmail } from '../services/email.service.js';
 export const requestPasswordReset = async (req, res) => {
     try {
         const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ mensaje: 'El email es requerido' });
+        }
+
         const usuario = await Usuario.findOne({ where: { email } });
 
         if (!usuario) {
@@ -18,18 +23,34 @@ export const requestPasswordReset = async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        await sendPasswordResetEmail(email, resetToken);
-
-        res.json({ mensaje: 'Se ha enviado un correo con las instrucciones' });
+        try {
+            await sendPasswordResetEmail(email, resetToken);
+            res.json({ mensaje: 'Se ha enviado un correo con las instrucciones' });
+        } catch (emailError) {
+            console.error('Error al enviar email:', emailError);
+            res.status(500).json({
+                mensaje: 'Error al enviar el correo de recuperación',
+                error: emailError.message
+            });
+        }
     } catch (error) {
         console.error('Error en recuperación de contraseña:', error);
-        res.status(500).json({ mensaje: 'Error al procesar la solicitud' });
+        res.status(500).json({
+            mensaje: 'Error al procesar la solicitud',
+            error: error.message
+        });
     }
 };
 
 export const resetPassword = async (req, res) => {
     try {
         const { token, newPassword } = req.body;
+
+        if (!token || !newPassword) {
+            return res.status(400).json({
+                mensaje: 'Token y nueva contraseña son requeridos'
+            });
+        }
 
         const decoded = jwt.verify(
             token,
@@ -50,6 +71,13 @@ export const resetPassword = async (req, res) => {
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({ mensaje: 'El enlace ha expirado' });
         }
-        res.status(500).json({ mensaje: 'Error al restablecer la contraseña' });
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ mensaje: 'Token inválido' });
+        }
+        console.error('Error al restablecer contraseña:', error);
+        res.status(500).json({
+            mensaje: 'Error al restablecer la contraseña',
+            error: error.message
+        });
     }
 };

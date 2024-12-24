@@ -1,6 +1,9 @@
 import Usuario from '../models/Usuario.js';
 import { generarToken, formatearUsuario } from '../utils/jwt.utils.js';
 import { emitUserUpdate } from '../services/socketService.js';
+import { sendVerificationEmail } from '../services/email.service.js';
+import crypto from 'crypto';
+
 
 export const login = async (req, res) => {
     try {
@@ -9,6 +12,13 @@ export const login = async (req, res) => {
 
         if (!usuario || !(await usuario.validarPassword(password))) {
             return res.status(401).json({ mensaje: 'Credenciales inválidas' });
+        }
+
+        if (!usuario.email_verificado) {
+            return res.status(403).json({
+                mensaje: 'Por favor verifica tu correo electrónico para acceder',
+                needsVerification: true
+            });
         }
 
         if (!usuario.activo) {
@@ -29,18 +39,32 @@ export const login = async (req, res) => {
 export const registro = async (req, res) => {
     try {
         const { nombre, email, password } = req.body;
-        const usuario = await Usuario.create({ nombre, email, password });
-        const token = generarToken(usuario);
-        res.status(201).json({
-            token,
-            usuario: formatearUsuario(usuario)
+        const token_verificacion = crypto.randomBytes(32).toString('hex');
+
+        const usuario = await Usuario.create({
+            nombre,
+            email,
+            password,
+            token_verificacion,
+            email_verificado: false
         });
+
+        try {
+            await sendVerificationEmail(email, token_verificacion);
+            res.status(201).json({
+                mensaje: 'Usuario registrado. Por favor verifica tu correo electrónico.'
+            });
+        } catch (emailError) {
+            // Si falla el envío del correo, eliminamos el usuario creado
+            await usuario.destroy();
+            throw new Error('Error al enviar el correo de verificación');
+        }
     } catch (error) {
         if (error.name === 'SequelizeUniqueConstraintError') {
             return res.status(400).json({ mensaje: 'El email ya está registrado' });
         }
         console.error('Error en registro:', error);
-        res.status(500).json({ mensaje: 'Error al registrar usuario' });
+        res.status(500).json({ mensaje: error.message });
     }
 };
 
@@ -120,5 +144,49 @@ export const cambiarRolUsuario = async (req, res) => {
     } catch (error) {
         console.error('Error al cambiar rol del usuario:', error);
         res.status(500).json({ mensaje: 'Error al cambiar rol del usuario' });
+    }
+};
+
+export const reenviarVerificacion = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const usuario = await Usuario.findOne({ where: { email } });
+
+        if (!usuario) {
+            return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+        }
+
+        if (usuario.email_verificado) {
+            return res.status(400).json({ mensaje: 'El email ya está verificado' });
+        }
+
+        const token_verificacion = crypto.randomBytes(32).toString('hex');
+        usuario.token_verificacion = token_verificacion;
+        await usuario.save();
+
+        await sendVerificationEmail(email, token_verificacion);
+        res.json({ mensaje: 'Correo de verificación reenviado' });
+    } catch (error) {
+        console.error('Error al reenviar verificación:', error);
+        res.status(500).json({ mensaje: 'Error al reenviar el correo de verificación' });
+    }
+};
+export const verificarEmail = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const usuario = await Usuario.findOne({ where: { token_verificacion: token } });
+
+        if (!usuario) {
+            return res.status(400).json({ mensaje: 'Token de verificación inválido' });
+        }
+
+        usuario.email_verificado = true;
+        usuario.token_verificacion = null;
+        await usuario.save();
+
+        res.json({ mensaje: 'Email verificado exitosamente' });
+    } catch (error) {
+        console.error('Error al verificar email:', error);
+        res.status(500).json({ mensaje: 'Error al verificar email' });
     }
 };
