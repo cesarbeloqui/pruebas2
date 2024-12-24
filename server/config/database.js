@@ -1,6 +1,7 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 import { addActivoColumn } from '../migrations/add_activo_column.js';
+import { addEmailVerification } from '../migrations/add_email_verification.js'; // Añade esta línea
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ const testConnection = async () => {
 
     // Run migrations
     await addActivoColumn();
+    await addEmailVerification(); // Añade esta línea
 
     return true;
   } catch (error) {

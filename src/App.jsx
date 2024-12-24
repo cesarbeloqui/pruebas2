@@ -5,6 +5,7 @@ import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
 import ForgotPasswordForm from './components/auth/ForgotPasswordForm';
 import ResetPasswordForm from './components/auth/ResetPasswordForm';
+import VerifyEmail from './components/auth/VerifyEmail';
 import Dashboard from './pages/Dashboard';
 import Usuarios from './pages/Usuarios/index';
 import Estadisticas from './pages/Estadisticas';
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="/registro" element={<RegisterForm />} />
         <Route path="/forgot-password" element={<ForgotPasswordForm />} />
         <Route path="/reset-password/:token" element={<ResetPasswordForm />} />
+        <Route path="/verify-email/:token" element={<VerifyEmail />} />
 
         <Route path="/dashboard" element={
           <ProtectedRoute>

@@ -2,25 +2,58 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Input } from '../ui/input';
+import { PasswordInput } from '../ui/password-input';
 import { Button } from '../ui/button';
 import { Label } from '../ui/label';
+import { FormError, FieldError } from '../ui/form-error';
+import { useFormError } from '../../hooks/useFormError';
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const { error, fieldErrors, handleError, clearErrors } = useFormError();
+
+  const validateForm = () => {
+    clearErrors();
+    let isValid = true;
+
+    if (!formData.email) {
+      handleError('El email es requerido', 'email');
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      handleError('Email inválido', 'email');
+      isValid = false;
+    }
+
+    if (!formData.password) {
+      handleError('La contraseña es requerida', 'password');
+      isValid = false;
+    }
+
+    return isValid;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    if (!validateForm()) return;
+
+    setLoading(true);
+    clearErrors();
+
     const result = await login(formData);
     if (!result.success) {
-      setError(result.error);
+      handleError(result.error);
     }
+    setLoading(false);
   };
 
   const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (fieldErrors[name]) {
+      handleError('', name);
+    }
   };
 
   return (
@@ -32,11 +65,7 @@ export default function LoginForm() {
             <p className="text-gray-400">Ingresa tus credenciales para continuar</p>
           </div>
 
-          {error && (
-            <div className="mb-6 p-4 bg-red-900/20 border border-red-800 rounded-lg">
-              <p className="text-red-500 text-sm">{error}</p>
-            </div>
-          )}
+          <FormError error={error} />
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
@@ -50,6 +79,7 @@ export default function LoginForm() {
                 onChange={handleChange}
                 required
               />
+              <FieldError error={fieldErrors.email} />
             </div>
 
             <div className="space-y-2">
@@ -62,19 +92,18 @@ export default function LoginForm() {
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
-              <Input
+              <PasswordInput
                 id="password"
                 name="password"
-                type="password"
-                placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
                 required
               />
+              <FieldError error={fieldErrors.password} />
             </div>
 
-            <Button type="submit">
-              Iniciar sesión
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Procesando...' : 'Iniciar sesión'}
             </Button>
           </form>
 

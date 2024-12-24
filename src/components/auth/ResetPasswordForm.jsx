@@ -1,32 +1,56 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Input } from '../ui/input';
+import { PasswordInput } from '../ui/password-input';
 import { Button } from '../ui/button';
 import { Label } from '../ui/label';
+import { FormError, FieldError } from '../ui/form-error';
+import { useFormError } from '../../hooks/useFormError';
 
 export default function ResetPasswordForm() {
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
+    const [formData, setFormData] = useState({
+        password: '',
+        confirmPassword: ''
+    });
     const [loading, setLoading] = useState(false);
     const { token } = useParams();
     const navigate = useNavigate();
+    const { error, fieldErrors, handleError, clearErrors } = useFormError();
+
+    const validateForm = () => {
+        clearErrors();
+        let isValid = true;
+
+        if (!formData.password) {
+            handleError('La contraseña es requerida', 'password');
+            isValid = false;
+        } else if (formData.password.length < 6) {
+            handleError('La contraseña debe tener al menos 6 caracteres', 'password');
+            isValid = false;
+        }
+
+        if (!formData.confirmPassword) {
+            handleError('Confirma tu contraseña', 'confirmPassword');
+            isValid = false;
+        } else if (formData.password !== formData.confirmPassword) {
+            handleError('Las contraseñas no coinciden', 'confirmPassword');
+            isValid = false;
+        }
+
+        return isValid;
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (password !== confirmPassword) {
-            setError('Las contraseñas no coinciden');
-            return;
-        }
+        if (!validateForm()) return;
 
         setLoading(true);
-        setError('');
+        clearErrors();
 
         try {
             const response = await fetch('http://localhost:3000/api/auth/reset-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token, newPassword: password }),
+                body: JSON.stringify({ token, newPassword: formData.password }),
             });
 
             const data = await response.json();
@@ -36,12 +60,20 @@ export default function ResetPasswordForm() {
                     state: { message: 'Contraseña actualizada exitosamente' }
                 });
             } else {
-                setError(data.mensaje);
+                handleError(data.mensaje);
             }
         } catch (error) {
-            setError('Error al restablecer la contraseña');
+            handleError('Error al restablecer la contraseña');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (fieldErrors[name]) {
+            handleError('', name);
         }
     };
 
@@ -54,33 +86,31 @@ export default function ResetPasswordForm() {
                         <p className="text-gray-400">Ingresa tu nueva contraseña</p>
                     </div>
 
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-900/20 border border-red-800 rounded-lg">
-                            <p className="text-red-500 text-sm">{error}</p>
-                        </div>
-                    )}
+                    <FormError error={error} />
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
                             <Label htmlFor="password">Nueva contraseña</Label>
-                            <Input
+                            <PasswordInput
                                 id="password"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
                                 required
                             />
+                            <FieldError error={fieldErrors.password} />
                         </div>
 
                         <div className="space-y-2">
                             <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
-                            <Input
+                            <PasswordInput
                                 id="confirmPassword"
-                                type="password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                name="confirmPassword"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
                                 required
                             />
+                            <FieldError error={fieldErrors.confirmPassword} />
                         </div>
 
                         <Button type="submit" disabled={loading}>
