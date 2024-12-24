@@ -65,8 +65,8 @@ export default function Usuarios() {
   if (user?.rolActual !== 'admin') {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Acceso Restringido</h2>
-        <p className="text-gray-600">No tienes permisos para ver esta página.</p>
+        <h2 className="text-2xl font-bold text-white mb-4">Acceso Restringido</h2>
+        <p className="text-gray-400">No tienes permisos para ver esta página.</p>
       </div>
     );
   }
@@ -74,8 +74,8 @@ export default function Usuarios() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">Gestión de Usuarios</h2>
-        <Button className="flex items-center space-x-2">
+        <h2 className="text-2xl font-bold text-white">Gestión de Usuarios</h2>
+        <Button className="flex items-center space-x-2 bg-[#646cff] hover:bg-[#747bff]">
           <PlusIcon className="w-4 h-4" />
           <span>Agregar Usuario</span>
         </Button>
@@ -83,11 +83,11 @@ export default function Usuarios() {
 
       <div className="grid gap-6">
         {usuarios.map((usuario) => (
-          <Card key={usuario.id}>
+          <Card key={usuario.id} className="bg-[#1a1a1a] border-gray-800">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-base font-medium">
+              <CardTitle className="text-base font-medium text-gray-200">
                 <div className="flex items-center space-x-2">
-                  <UserIcon className="w-4 h-4 text-gray-500" />
+                  <UserIcon className="w-4 h-4 text-gray-400" />
                   <span>{usuario.nombre}</span>
                 </div>
               </CardTitle>
@@ -98,15 +98,15 @@ export default function Usuarios() {
                   className="flex items-center space-x-1"
                   onClick={() => cambiarRolUsuario(usuario.id, usuario.rol === 'admin' ? 'usuario' : 'admin')}
                 >
-                  <ShieldIcon className={`w-4 h-4 ${usuario.rol === 'admin' ? 'text-purple-600' : 'text-blue-600'}`} />
-                  <span className={`text-xs ${usuario.rol === 'admin' ? 'text-purple-600' : 'text-blue-600'}`}>
+                  <ShieldIcon className={`w-4 h-4 ${usuario.rol === 'admin' ? 'text-[#646cff]' : 'text-gray-400'}`} />
+                  <span className={`text-xs ${usuario.rol === 'admin' ? 'text-[#646cff]' : 'text-gray-400'}`}>
                     {usuario.rol}
                   </span>
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={usuario.activo ? 'text-red-600' : 'text-green-600'}
+                  className={usuario.activo ? 'text-red-500' : 'text-green-500'}
                   onClick={() => toggleEstadoUsuario(usuario.id)}
                 >
                   <TrashIcon className="w-4 h-4" />
@@ -114,8 +114,8 @@ export default function Usuarios() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500">{usuario.email}</p>
-              <p className="text-xs text-gray-400">
+              <p className="text-sm text-gray-400">{usuario.email}</p>
+              <p className="text-xs text-gray-500">
                 Registrado el: {new Date(usuario.createdAt).toLocaleDateString()}
               </p>
             </CardContent>

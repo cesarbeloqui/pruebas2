@@ -6,7 +6,8 @@ import {
   verificarUsuario,
   cambiarRol,
   listarUsuarios,
-  toggleUsuario
+  toggleUsuario,
+  cambiarRolUsuario
 } from '../controllers/auth.controller.js';
 
 const router = express.Router();
@@ -22,5 +23,6 @@ router.post('/switch-role', verificarToken, cambiarRol);
 // Rutas admin
 router.get('/usuarios', verificarToken, esAdmin, listarUsuarios);
 router.put('/usuarios/:id/toggle', verificarToken, esAdmin, toggleUsuario);
+router.put('/usuarios/:id/rol', verificarToken, esAdmin, cambiarRolUsuario);
 
 export default router;

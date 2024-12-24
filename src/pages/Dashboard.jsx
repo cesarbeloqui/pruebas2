@@ -28,64 +28,64 @@ export default function Dashboard() {
     notificaciones: 8,
     crecimiento: '+23%'
   });
-  
+
   const socket = useSocket();
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">Panel de Control</h2>
-        <div className="text-sm text-gray-500">Última actualización: Hace 5 minutos</div>
+        <h2 className="text-2xl font-bold text-white">Panel de Control</h2>
+        <div className="text-sm text-gray-400">Última actualización: Hace 5 minutos</div>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
+        <Card className="bg-[#1a1a1a] border-gray-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Usuarios Totales</CardTitle>
-            <UsersIcon className="h-4 w-4 text-primary" />
+            <CardTitle className="text-sm font-medium text-gray-200">Usuarios Totales</CardTitle>
+            <UsersIcon className="h-4 w-4 text-[#646cff]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.usuarios}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-white">{stats.usuarios}</div>
+            <p className="text-xs text-gray-400">
               <span className="text-green-500">↑12%</span> desde el último mes
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-[#1a1a1a] border-gray-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sesiones Activas</CardTitle>
-            <ActivityIcon className="h-4 w-4 text-secondary" />
+            <CardTitle className="text-sm font-medium text-gray-200">Sesiones Activas</CardTitle>
+            <ActivityIcon className="h-4 w-4 text-[#646cff]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.sesionesActivas}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-white">{stats.sesionesActivas}</div>
+            <p className="text-xs text-gray-400">
               <span className="text-green-500">↑8%</span> desde ayer
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-[#1a1a1a] border-gray-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Notificaciones</CardTitle>
-            <BellIcon className="h-4 w-4 text-orange-500" />
+            <CardTitle className="text-sm font-medium text-gray-200">Notificaciones</CardTitle>
+            <BellIcon className="h-4 w-4 text-[#646cff]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.notificaciones}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-white">{stats.notificaciones}</div>
+            <p className="text-xs text-gray-400">
               +3 nuevas desde ayer
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-[#1a1a1a] border-gray-800">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tasa de Crecimiento</CardTitle>
-            <TrendingUpIcon className="h-4 w-4 text-green-500" />
+            <CardTitle className="text-sm font-medium text-gray-200">Tasa de Crecimiento</CardTitle>
+            <TrendingUpIcon className="h-4 w-4 text-[#646cff]" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.crecimiento}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-white">{stats.crecimiento}</div>
+            <p className="text-xs text-gray-400">
               En los últimos 30 días
             </p>
           </CardContent>
@@ -93,18 +93,25 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="bg-[#1a1a1a] border-gray-800">
           <CardHeader>
-            <CardTitle>Actividad de Usuarios</CardTitle>
+            <CardTitle className="text-gray-200">Actividad de Usuarios</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={mockData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                  <XAxis dataKey="name" stroke="#666" />
+                  <YAxis stroke="#666" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#1a1a1a',
+                      border: '1px solid #333',
+                      borderRadius: '8px',
+                      color: '#fff'
+                    }}
+                  />
                   <Line type="monotone" dataKey="usuarios" stroke="#646cff" strokeWidth={2} />
                   <Line type="monotone" dataKey="sesiones" stroke="#10B981" strokeWidth={2} />
                 </LineChart>
@@ -113,22 +120,22 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-[#1a1a1a] border-gray-800">
           <CardHeader>
-            <CardTitle>Actividad Reciente</CardTitle>
+            <CardTitle className="text-gray-200">Actividad Reciente</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {actividadReciente.map((actividad) => (
-                <div key={actividad.id} className="flex items-center space-x-4 border-b pb-4 last:border-0">
-                  <div className="bg-primary/10 p-2 rounded-full">
-                    <UsersIcon className="h-4 w-4 text-primary" />
+                <div key={actividad.id} className="flex items-center space-x-4 border-b border-gray-800 pb-4 last:border-0">
+                  <div className="bg-[#646cff]/10 p-2 rounded-full">
+                    <UsersIcon className="h-4 w-4 text-[#646cff]" />
                   </div>
                   <div className="flex-1 space-y-1">
-                    <p className="text-sm font-medium">{actividad.usuario}</p>
-                    <p className="text-xs text-gray-500">{actividad.accion}</p>
+                    <p className="text-sm font-medium text-gray-200">{actividad.usuario}</p>
+                    <p className="text-xs text-gray-400">{actividad.accion}</p>
                   </div>
-                  <div className="text-xs text-gray-500">{actividad.tiempo}</div>
+                  <div className="text-xs text-gray-400">{actividad.tiempo}</div>
                 </div>
               ))}
             </div>
