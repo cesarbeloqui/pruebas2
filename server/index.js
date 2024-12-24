@@ -2,8 +2,10 @@ import express from 'express';
 import { createServer } from 'http';
 import cors from 'cors';
 import { sequelize, testConnection } from './config/database.js';
-import authRoutes from './routes/auth.js';
+import authRoutes from './routes/auth/index.js';
 import { initializeSocket } from './services/socketService.js';
+
+
 
 const app = express();
 const httpServer = createServer(app);
@@ -14,6 +16,7 @@ const io = initializeSocket(httpServer);
 app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRoutes);
+
 
 const PORT = process.env.PORT || 3000;
 

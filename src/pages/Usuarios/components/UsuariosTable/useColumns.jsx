@@ -60,8 +60,8 @@ export function useColumns({ onToggleEstado, onCambiarRol }) {
                         <div className="flex items-center gap-3">
                             <button
                                 className={`p-1.5 rounded-full transition-colors ${usuario.rol === 'admin'
-                                    ? 'text-[#646cff] hover:bg-[#646cff]/10'
-                                    : 'text-[#646cff] hover:bg-[#646cff]/10'
+                                    ? 'text-yellow-500 hover:bg-yellow-500/10'
+                                    : 'text-gray-400 hover:bg-gray-400/10'
                                     }`}
                                 onClick={() => onCambiarRol(usuario.id, usuario.rol === 'admin' ? 'usuario' : 'admin')}
                                 title={usuario.rol === 'admin' ? 'Hacer Usuario' : 'Hacer Administrador'}
